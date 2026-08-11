@@ -30,3 +30,20 @@ To prosta aplikacja webowa służąca do przeprowadzania losowań grup podczas t
 
 Aplikacja działa na czystym HTML + JS + CSS, nie wymaga backendu ani instalacji narzędzi. 
  
+
+---
+
+## Licencja
+
+Copyright © 2026 Sebastian Bisaga. Wszelkie prawa zastrzeżone.
+
+Kod jest udostępniony publicznie do wglądu, ale **nie jest oprogramowaniem
+open source**. Bezpłatne korzystanie obejmuje turnieje Polskiej Federacji
+Mölkky oraz lokalne ligi i turnieje Mölkky w Polsce. Modyfikowanie,
+rozpowszechnianie i uruchamianie własnych wdrożeń wymaga pisemnej zgody
+autora, a zastosowania komercyjne — odrębnej umowy.
+
+Logo Polskiej Federacji Mölkky oraz logotypy klubów **nie są objęte tą
+licencją** i pozostają własnością odpowiednich podmiotów.
+
+Pełne warunki: [LICENSE](LICENSE).
