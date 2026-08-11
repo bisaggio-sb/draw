@@ -12,10 +12,10 @@ To prosta aplikacja webowa służąca do przeprowadzania losowań grup podczas t
 
 #### Podgląd działania:
 - Wersja produkcyjna dostępna na:  
-  [https://polska-federacja-molkky.github.io/draw/](https://polska-federacja-molkky.github.io/draw/)
+  [https://bisaggio-sb.github.io/draw/](https://bisaggio-sb.github.io/draw/)
 
 - Podgląd zmian deweloperskich:  
-  [https://polska-federacja-molkky.github.io/draw/test-preview/](https://polska-federacja-molkky.github.io/draw/test-preview/)
+  [https://bisaggio-sb.github.io/draw/test-preview/](https://bisaggio-sb.github.io/draw/test-preview/)
 
 ---
 
