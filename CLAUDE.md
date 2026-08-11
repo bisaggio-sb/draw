@@ -1,10 +1,10 @@
 # PFM — Losowanie grup (Mölkky) — notatki dla Claude
 
 Statyczna apka webowa (HTML/CSS/JS, GitHub Pages) do losowania grup turniejowych
-Polskiej Federacji Mölkky. Repo: **polska-federacja-molkky/draw**.
+Polskiej Federacji Mölkky. Repo: **bisaggio-sb/draw**.
 
 ## Gałęzie i deploy
-- **main** = PRODUKCJA → `https://polska-federacja-molkky.github.io/draw/`
+- **main** = PRODUKCJA → `https://bisaggio-sb.github.io/draw/`
   (deploy-prod.yml publikuje root repo do gh-pages).
 - **test-preview** = DEV/STAGING → `.../draw/test-preview/`
   (deploy-preview.yml kopiuje pliki do podkatalogu test-preview/).
