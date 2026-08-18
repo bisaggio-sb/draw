@@ -1,6 +1,6 @@
-# Losowanie grup – Polska Federacja Mölkky
+# Losowanie grup – Mölkky
 
-To prosta aplikacja webowa służąca do przeprowadzania losowań grup podczas turniejów organizowanych przez Polską Federację Mölkky.
+To prosta aplikacja webowa służąca do przeprowadzania losowań grup podczas turniejów Mölkky.
 
 #### Funkcje:
 - Losowanie zawodników do grup na podstawie wprowadzonego seeda (hasła) i "koszyków".
