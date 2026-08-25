@@ -302,8 +302,14 @@ function bgHeaderNums(line) { return (line.match(/\d+/g) || []).map(Number); }
 // Główne okno → koszyki ze slotami (puste wiersze = puste miejsca).
 // Uwaga: ostatni koszyk powinien kończyć się wpisami (X / Gracz N), nie samymi
 // pustymi wierszami — końcowe puste ostatniego koszyka są przycinane jako kosmetyka.
-function bgParseMainSlots(text) {
-  const lines = text.replace(/[\s﻿]+$/, "").split(/\r?\n/);
+// poolBaskets (opcjonalny Set numerów koszyków wskazanych w blokach drugiego
+// okna) decyduje o losie końcowych pustych wierszy — patrz komentarz niżej.
+// Bez niego zachowanie jest takie jak dawniej: ogon pustych leci w całości.
+function bgParseMainSlots(text, poolBaskets) {
+  // Bez obcinania ogona na wejściu: w polu tekstowym każdy enter to widoczny
+  // pusty wiersz, więc split odwzorowuje to, co użytkownik ma na ekranie.
+  // Nadmiarem zajmuje się dopiero przycinanie na końcu funkcji.
+  const lines = text.split(/\r?\n/);
   const mainByNum = {}; let cur = null;
   for (const raw of lines) {
     const line = raw.trim();
@@ -317,12 +323,38 @@ function bgParseMainSlots(text) {
     const p = bgLine(raw);
     cur.slots.push({ name: p.name, club: p.club });
   }
+  // Końcowe puste wiersze ostatniego koszyka bywają ogonem po wklejce z Excela,
+  // ale bywają też celowo zostawionymi miejscami do obsadzenia z bloku
+  // konfliktowego. Rozstrzyga to, czy któryś blok w ogóle celuje w ten koszyk:
+  //  - nie celuje → ogon leci w całości, jak dawniej (kosmetyka),
+  //  - celuje → to siatka, więc przycinamy tylko nadmiar ponad najdłuższy
+  //    z pozostałych koszyków. Dzięki temu ostatni koszyk pusty w całości
+  //    przestaje znikać do zera (blokowało to losowanie na „nie zgadza się"),
+  //    a końcowy znak nowej linii z wklejki nadal nie robi lewego miejsca.
+  // Przy jednym koszyku nie ma punktu odniesienia, więc zostaje stare cięcie.
   const nums = Object.keys(mainByNum).map(Number);
   if (nums.length) {
-    const last = mainByNum[Math.max(...nums)];
-    while (last.slots.length && last.slots[last.slots.length - 1].empty) last.slots.pop();
+    const lastNum = Math.max(...nums);
+    const last = mainByNum[lastNum];
+    const keep = (poolBaskets && poolBaskets.has(lastNum))
+      ? nums.filter(n => n !== lastNum)
+            .reduce((m, n) => Math.max(m, mainByNum[n].slots.length), 0)
+      : 0;
+    while (last.slots.length > keep && last.slots[last.slots.length - 1].empty) last.slots.pop();
   }
   return mainByNum;
+}
+
+// Numery koszyków wskazane w nagłówkach bloków drugiego okna. Liczone z samego
+// tekstu, bez oglądania się na główne okno — bo wynik jest potrzebny zanim
+// główne okno zostanie sparsowane.
+function bgConflictBasketNums(conflictText) {
+  const nums = new Set();
+  for (const raw of (conflictText || "").split(/\r?\n/)) {
+    const line = raw.trim();
+    if (/^KOSZYK\b/i.test(line)) for (const n of bgHeaderNums(line)) nums.add(n);
+  }
+  return nums;
 }
 
 // Drugie okno → pule konfliktowe [{label, baskets, players}]; puste wiersze pomijane.
@@ -352,7 +384,7 @@ function bgParseConflictPools(text, mainByNum) {
 // potrafiło zostawić kogoś bez miejsca. Matching gwarantuje obsadzenie
 // wszystkich (o ile układ jest wykonalny) i losuje przez tasowanie sąsiedztw.
 function resolveBasketAssignment(mainText, conflictText) {
-  const mainByNum = bgParseMainSlots(mainText);
+  const mainByNum = bgParseMainSlots(mainText, bgConflictBasketNums(conflictText));
   const pools = bgParseConflictPools(conflictText, mainByNum);
   if (!pools.length) return null;
 
@@ -543,7 +575,7 @@ function startBasketAssignment(mainText, conflictText) {
   // Odsłanianie BLOK po BLOKU (kolejność jak w drugim oknie), a w obrębie bloku
   // rosnąco po numerze koszyka — kolejność ustalona już w resolveBasketAssignment.
   const steps = res.steps.slice();
-  const mainByNum = bgParseMainSlots(mainText);
+  const mainByNum = bgParseMainSlots(mainText, bgConflictBasketNums(conflictText));
   const poolsView = bgParseConflictPools(conflictText, mainByNum)
     .map(p => ({ label: p.label, players: p.players.slice() }));
   BASKET = { active: true, steps, idx: 0, finalText: res.text, warnings: res.warnings, poolsView };
@@ -681,7 +713,7 @@ function plural(n, forms) {
 function validatePreAssign(mainText, conflictText, groupCount) {
   const result = { empty: !mainText, counts: null, warnings: [], errors: [] };
   if (!mainText) return result;
-  const mainByNum = bgParseMainSlots(mainText);
+  const mainByNum = bgParseMainSlots(mainText, bgConflictBasketNums(conflictText));
   const pools = bgParseConflictPools(conflictText, mainByNum);
   let mainReal = 0, empties = 0;
   const emptyPer = [];
@@ -714,7 +746,8 @@ function validatePreAssign(mainText, conflictText, groupCount) {
 }
 
 function validateInput() {
-  const text = document.getElementById("input")?.value.trim() ?? "";
+  const rawInput = document.getElementById("input")?.value ?? "";
+  const text = rawInput.trim();
   const teamMode = document.getElementById("modeTeam")?.checked === true;
   const useBaskets = basketsEnabled();
   const groupCount = parseInt(document.getElementById("groupCount")?.value, 10);
@@ -722,7 +755,11 @@ function validateInput() {
   // Tryb pre-losowania przydziału do koszyków — inna, świadoma konfliktów walidacja.
   if (document.getElementById("preAssignBaskets")?.checked === true) {
     const conflictText = document.getElementById("conflictInput")?.value ?? "";
-    return validatePreAssign(text, conflictText, groupCount);
+    // Tu świadomie NIE ucinamy końca wartości pola: puste wiersze na dole
+    // ostatniego koszyka to miejsca do obsadzenia z bloku, a nie ogon do
+    // wyrzucenia. Startowe losowanie dostaje surową wartość tak samo, więc
+    // walidacja i losowanie liczą miejsca identycznie.
+    return validatePreAssign(text ? rawInput.replace(/^\s+/, "") : "", conflictText, groupCount);
   }
 
   const result = { empty: !text, counts: null, warnings: [], errors: [] };
