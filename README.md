@@ -37,13 +37,24 @@ Aplikacja działa na czystym HTML + JS + CSS, nie wymaga backendu ani instalacji
 
 Copyright © 2026 Sebastian Bisaga. Wszelkie prawa zastrzeżone.
 
-Kod jest udostępniony publicznie do wglądu, ale **nie jest oprogramowaniem
-open source**. Bezpłatne korzystanie obejmuje turnieje Polskiej Federacji
-Mölkky oraz lokalne ligi i turnieje Mölkky w Polsce. Modyfikowanie,
-rozpowszechnianie i uruchamianie własnych wdrożeń wymaga pisemnej zgody
-autora, a zastosowania komercyjne — odrębnej umowy.
+**Aplikacja powstała na potrzeby Polskiej Federacji Mölkky i pozostaje dla niej
+bezpłatna.** PFM oraz lokalne ligi i turnieje Mölkky w Polsce mogą z niej
+korzystać bez opłat i bezterminowo, a ewentualne wypowiedzenie wymaga
+sześciomiesięcznego okresu — tak, by nigdy nie przerwać trwającego sezonu.
 
-Logo Polskiej Federacji Mölkky oraz logotypy klubów **nie są objęte tą
-licencją** i pozostają własnością odpowiednich podmiotów.
+Kod jest udostępniony publicznie do wglądu, ale **nie jest oprogramowaniem
+open source**. Modyfikowanie, rozpowszechnianie i uruchamianie własnych wdrożeń
+wymaga pisemnej zgody autora, a zastosowania komercyjne — odrębnej umowy.
+
+Osobno zabezpieczona jest ciągłość rozgrywek: **Federacja może w każdej chwili
+trzymać własną kopię** aplikacji, a gdyby wdrożenie autora przestało działać
+(albo autor przestał projekt utrzymywać) — uruchomić ją samodzielnie, bez
+pytania o zgodę. Warunki opisuje punkt 1a licencji.
+
+Herb w nagłówku aplikacji to **logo Polskiej Federacji Mölkky i jest własnością
+Federacji** — aplikacja działa obecnie w wersji przygotowanej dla PFM i używa
+go do jej oznaczenia. Logotypy klubów należą do poszczególnych klubów. Ani logo
+Federacji, ani herby klubów **nie są objęte tą licencją** i licencja nie udziela
+do nich żadnych praw.
 
 Pełne warunki: [LICENSE](LICENSE).

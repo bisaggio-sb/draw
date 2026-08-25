@@ -18,9 +18,37 @@ uruchamianie i używanie Oprogramowania na potrzeby organizacji i obsługi:
 Zgoda obejmuje korzystanie z Oprogramowania w postaci udostępnionej przez
 autora, w tym z prowadzonych przez niego wdrożeń publicznych.
 
+### 1a. Kopia zapasowa i ciągłość rozgrywek
+
+Niezależnie od ograniczeń z punktu 2, Polska Federacja Mölkky może **w każdej
+chwili** przechowywać własną kopię Oprogramowania, w tym kopię repozytorium.
+Uprawnienie to przysługuje od razu i bezwarunkowo — po to, by kopia istniała
+zawczasu, zanim okaże się potrzebna.
+
+Federacja może ponadto **uruchomić i publicznie udostępnić własne wdrożenie**
+tej kopii, bez potrzeby uzyskiwania odrębnej zgody, jeżeli zajdzie
+którakolwiek z okoliczności:
+
+- a) wdrożenie prowadzone przez autora jest niedostępne nieprzerwanie przez
+  co najmniej 14 dni,
+- b) autor zaprzestał utrzymywania Oprogramowania przez co najmniej 6 miesięcy,
+- c) autor wypowiedział zgodę z punktu 1 — na czas biegu okresu wypowiedzenia,
+- d) autor zmarł lub trwale utracił możliwość prowadzenia projektu.
+
+Uprawnienie to obejmuje zmiany niezbędne do uruchomienia i bieżącej obsługi
+wdrożenia: konfigurację, adresy, dane turniejowe, ranking, listę klubów oraz
+poprawki błędów blokujących przeprowadzenie losowania. Nie obejmuje rozwijania
+Oprogramowania o nowe funkcje, udostępniania go poza zakresem punktu 1 ani
+zastosowań komercyjnych.
+
+W przypadku lit. a) i c) uprawnienie do prowadzenia własnego wdrożenia wygasa,
+gdy przyczyna ustanie; kopia z akapitu pierwszego pozostaje dozwolona zawsze.
+Skorzystanie z niniejszego punktu nie stanowi naruszenia punktu 2.
+
 ## 2. Ograniczenia
 
-Bez uprzedniej pisemnej zgody autora nie wolno:
+Z zastrzeżeniem uprawnień Polskiej Federacji Mölkky opisanych w punkcie 1a,
+bez uprzedniej pisemnej zgody autora nie wolno:
 
 - a) modyfikować ani adaptować Oprogramowania, ani tworzyć jego opracowań,
 - b) rozpowszechniać Oprogramowania ani jego części, w tym uruchamiać
@@ -52,6 +80,9 @@ Wypowiedzenie wymaga formy pisemnej i zachowania sześciomiesięcznego okresu,
 tak aby nie przerywać trwającego sezonu rozgrywek. Naruszenie punktu 2
 powoduje wygaśnięcie zgody ze skutkiem natychmiastowym.
 
+Uprawnienia z punktu 1a przysługują Federacji przez cały czas obowiązywania
+zgody, w tym w okresie wypowiedzenia.
+
 ## 6. Wyłączenie odpowiedzialności
 
 Oprogramowanie udostępniane jest „tak jak jest", bez jakichkolwiek gwarancji
@@ -81,6 +112,14 @@ tournaments held in Poland. Modification, redistribution, sublicensing and
 self-hosting are **not permitted** without prior written consent. Any other
 use, including commercial use and deployments outside Poland, requires a
 separate written agreement with the author.
+
+As an exception (clause 1a), the Polish Mölkky Federation may keep its own
+copy of the software at any time, and may run its own public deployment of
+that copy — without further consent — if the author's deployment stays down
+for 14 days, if the author stops maintaining the software for six months,
+during the notice period after the author revokes permission, or if the author
+dies or becomes permanently unable to run the project. That right covers the
+changes needed to operate the deployment, but not new feature development.
 
 Third-party trademarks and artwork contained in this repository (including
 federation and club logos) are excluded from this licence.
