@@ -15,16 +15,27 @@ Polskiej Federacji Mölkky. Repo: **bisaggio-sb/draw**.
   twardego refreshu; gh-pages aktualizuje się ~30–60 s.
 
 ## ⚠️ NAJWAŻNIEJSZY INWARIANT
-**main i test-preview różnią się WYŁĄCZNIE plikiem `config.js`.** Zawsze to
-utrzymuj. `config.js` na main: `{ groupStats: false }`, na test: `true`.
-Promocja na produkcję = nałóż drzewo z testu na main i ustaw `groupStats:false`:
+**main i test-preview różnią się co najwyżej plikiem `config.js`** — i nigdy
+niczym innym. Zawsze to utrzymuj.
+
+Od włączenia statystyk na produkcji `config.js` jest **identyczny na obu
+gałęziach** (`{ groupStats: true }`), więc drzewa są w tej chwili takie same.
+Nie jest to błąd i nie „naprawiaj" tego przez wyłączenie flagi na main —
+statystyki na produkcji to świadoma decyzja właściciela repo.
+
+Promocja na produkcję = nałóż drzewo z testu na main:
 ```
 git checkout main && git pull --ff-only origin main
 git checkout test-preview -- .
-# ustaw config.js na groupStats:false (nadpisz)
 git add -A && git commit && git push origin main
 ```
-Weryfikuj: `git diff main test-preview --stat` → ma pokazać tylko `config.js`.
+Weryfikuj: `git diff main test-preview --stat` → ma być pusty albo pokazywać
+wyłącznie `config.js`. Cokolwiek innego = błąd, cofnij.
+
+**Kolejność pushowania ma znaczenie.** Oba workflowy dzielą
+`concurrency: group: gh-pages, cancel-in-progress: true`, więc push na jedną
+gałąź ubija trwający deploy drugiej. Pushuj **najpierw test-preview**, poczekaj
+aż jego run się skończy, dopiero potem main.
 
 ## Pliki
 - `index.html`, `style.css` — UI/wygląd.
@@ -37,11 +48,13 @@ Weryfikuj: `git diff main test-preview --stat` → ma pokazać tylko `config.js`
 - `config.js` — flaga `groupStats` (patrz wyżej).
 
 ## Flaga groupStats (config.js)
-`true` włącza dolną część pod tabelą wyniku: mediana/średnia punktów per grupa,
-pasek siły, ciekawostki (najbardziej/najmniej różnorodna, najwyższa/najniższa
-mediana, najliczniejsze kluby), macierz klub×grupa. Te „bajery" są tylko na
-dev/test. **Znaczek 🌱 NIE zależy od flagi** — pokazuje się wszędzie, gdy jest
-`ranking.js`.
+`true` włącza kolumnę „Punkty" w tabeli wyniku (mediana/średnia punktów per
+grupa + pasek siły) oraz sekcję pod tabelą: ciekawostki (najbardziej/najmniej
+różnorodna grupa, najwyższa/najniższa mediana, najliczniejsze kluby) i macierz
+klub×grupa. **Włączone na produkcji i na dev/test** — wcześniej były to bajery
+tylko dla dev/test. Statystyki liczą się z `ranking.js`; osoby spoza rankingu
+wchodzą do nich jako 0 pkt. **Znaczek 🌱 NIE zależy od flagi** — pokazuje się
+wszędzie, gdy jest `ranking.js`.
 
 ## Główne funkcje
 - Tryby: z koszykami / bez; indywidualny / drużynowy.
