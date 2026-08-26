@@ -169,6 +169,12 @@ function clubBadge(club) {
 const RANKING_DATA = (typeof RANKING !== "undefined") ? RANKING : {};
 const RANKING_PRESENT = (typeof RANKING !== "undefined");
 const SHOW_GROUP_STATS = (typeof CONFIG !== "undefined" && CONFIG.groupStats === true);
+
+// W trybie drużynowym statystyki nie mają z czego się policzyć: drużyn nie ma
+// w rankingu zawodników (każda wychodziła na 0 pkt), a klubu w tym trybie nie
+// ma w ogóle — stąd „0 klubów" i mediana 0 w każdej grupie. Wyłączamy je tam
+// razem z kolumną „Punkty".
+function statsEnabled() { return SHOW_GROUP_STATS && !inTeamMode(); }
 function rankKey(s) {
   return (s || "").trim().toLowerCase()
     .replace(/ł/g, "l")
@@ -197,12 +203,31 @@ function median(arr) {
 // Renderuje zawartość komórki: imię/nazwisko w bloku po lewej, herb klubu
 // po prawej stronie. Rozbicie nazwiska na osobny wiersz daje większą czcionkę,
 // a herb obok nie zabiera pionu. Debiutant (brak w rankingu) dostaje 🌱.
+// Tryb drużynowy rozpoznajemy ze STATE, gdy losowanie trwa (żeby przełączenie
+// radia po losowaniu nie zmieniało już narysowanej tabeli), a przed startem
+// z zaznaczonej opcji.
+function inTeamMode() {
+  if (STATE && STATE.started) return STATE.teamMode === true;
+  return document.getElementById("modeTeam")?.checked === true;
+}
+
 function cellMarkup(name, club) {
   const isEmpty = (name === "—" && club === "—");
   if (isEmpty) {
     return `<div class="cell empty"><div class="cellName"><span class="firstName">—</span></div></div>`;
   }
   const trimmed = (name || "").trim();
+
+  // Drużyna to jedna nazwa własna, a nie imię i nazwisko — rozbijanie jej na
+  // pierwszy wyraz i resztę robiło z „Kaszubska ZaGRYFka" dwa człony o różnej
+  // grubości. Cała nazwa idzie więc w jeden blok i łamie się na spacjach.
+  // Znaczek debiutanta też odpada: drużyn nie ma w rankingu zawodników, więc
+  // 🌱 dostawała każda z nich. Klubu w tym trybie nie ma z definicji.
+  if (inTeamMode()) {
+    return `<div class="cell filled"><div class="cellName">` +
+      `<span class="teamName">${escapeHtml(trimmed)}</span></div></div>`;
+  }
+
   const sp = trimmed.indexOf(" ");
   const first = sp > 0 ? trimmed.slice(0, sp) : trimmed;
   const last  = sp > 0 ? trimmed.slice(sp + 1) : "";
@@ -226,6 +251,38 @@ function cellMarkup(name, club) {
 // najdłuższe nazwiska łamią się na 3 linie.
 // 21px od transpozycji tabeli (koszyki w kolumnach → kolumny szersze, jest zapas).
 const NAME_FONT_MAX = 21, NAME_FONT_MIN = 11;
+
+// Wspólny rozmiar czcionki nazw drużyn dla całej tabeli wyniku.
+// Dopasowywanie każdej komórki osobno (jak przy zawodnikach) dawało przy
+// drużynach kilkanaście różnych wielkości naraz — od „Lionheart" w pełnych
+// 21px po „Stowarzyszenie Aktywny Orlik III" mocno zmniejszone — i tabela
+// wyglądała na niepoukładaną. Liczymy więc raz, przed odsłanianiem, rozmiar
+// potrzebny najtrudniejszej nazwie i stosujemy go wszędzie.
+let TEAM_NAME_PX = null;
+
+function computeTeamNameSize() {
+  TEAM_NAME_PX = null;
+  if (!inTeamMode() || !STATE.steps || !STATE.steps.length) return;
+  const probe = document.querySelector(".resultTable td[id^='cell-b']");
+  if (!probe) return;
+  const keep = probe.innerHTML;
+  let min = NAME_FONT_MAX;
+  for (const s of STATE.steps) {
+    const nm = s.player && s.player.name;
+    if (!nm || isPlaceholderLine(nm) || isEmptyMarker(nm)) continue;
+    probe.innerHTML = cellMarkup(nm, "");
+    const span = probe.querySelector(".teamName");
+    if (!span) continue;
+    let fs = NAME_FONT_MAX, guard = 0;
+    span.style.fontSize = fs + "px";
+    while (fs > NAME_FONT_MIN && span.scrollWidth > span.clientWidth + 1 && guard < 12) {
+      fs -= 1; span.style.fontSize = fs + "px"; guard++;
+    }
+    if (fs < min) min = fs;
+  }
+  probe.innerHTML = keep;
+  TEAM_NAME_PX = min;
+}
 function fitName(span) {
   if (!span || !span.textContent) return;
   span.style.fontSize = "";                 // reset do domyślnych 21px (CSS)
@@ -241,6 +298,14 @@ function fitName(span) {
 }
 function fitCell(cell) {
   if (!cell) return;
+
+  // Drużyny: jeden wspólny rozmiar dla całej tabeli (patrz computeTeamNameSize).
+  const team = cell.querySelector(".teamName");
+  if (team) {
+    team.style.fontSize = (TEAM_NAME_PX || NAME_FONT_MAX) + "px";
+    return;
+  }
+
   const first = cell.querySelector(".firstName");
   const last = cell.querySelector(".lastName");
   fitName(first); fitName(last);
@@ -878,7 +943,7 @@ function buildTable(baskets, groupCount, useBaskets = true) {
     col.style.width = "auto";
     colgroup.appendChild(col);
   }
-  if (SHOW_GROUP_STATS) {
+  if (statsEnabled()) {
     const colStat = document.createElement("col");
     colStat.style.width = "150px";
     colgroup.appendChild(colStat);
@@ -900,7 +965,7 @@ function buildTable(baskets, groupCount, useBaskets = true) {
   });
 
   // Kolumna statystyk per grupa (tylko dev/test) — wypełnia się po zakończeniu.
-  if (SHOW_GROUP_STATS) {
+  if (statsEnabled()) {
     const thStat = document.createElement("th");
     thStat.textContent = "Punkty";
     trHead.appendChild(thStat);
@@ -925,7 +990,7 @@ function buildTable(baskets, groupCount, useBaskets = true) {
       tr.appendChild(td);
     });
 
-    if (SHOW_GROUP_STATS) {
+    if (statsEnabled()) {
       const td = document.createElement("td");
       td.id = `stat-g${g}`;
       td.className = "statCell statCol";
@@ -950,7 +1015,7 @@ function buildTable(baskets, groupCount, useBaskets = true) {
 //  • rozwijana macierz klub × grupa (podświetlone 2+ tego samego klubu w grupie)
 // Placeholdery („gracz N") i „X" pomijamy; brak w rankingu = 0 pkt.
 function renderGroupStats() {
-  if (!SHOW_GROUP_STATS) return;
+  if (!statsEnabled()) return;
   // Po transpozycji statystyki siedzą w kolumnie „Punkty" (komórki stat-g{g}).
   if (!document.getElementById("stat-g0") || !STATE.started) return;
   const G = STATE.groupCount;
@@ -1332,6 +1397,7 @@ function startDraw() {
   buildTable(baskets, groupCount, useBaskets);
 
   STATE = { steps, idx: 0, baskets, groupCount, started: true, finalSeed, salt, teamMode, useBaskets };
+  computeTeamNameSize();
 
   const allPlayers = baskets.flatMap(b => b.players);
   const placeholderCount = allPlayers.filter(p => p.placeholder).length;
@@ -1802,6 +1868,7 @@ function loadState() {
   };
 
   buildTable(STATE.baskets, STATE.groupCount, STATE.useBaskets);
+  computeTeamNameSize();
 
   for (let i = 0; i < STATE.idx; i++) {
     const s = STATE.steps[i];
