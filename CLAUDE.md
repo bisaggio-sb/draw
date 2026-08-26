@@ -56,6 +56,14 @@ tylko dla dev/test. Statystyki liczą się z `ranking.js`; osoby spoza rankingu
 wchodzą do nich jako 0 pkt. **Znaczek 🌱 NIE zależy od flagi** — pokazuje się
 wszędzie, gdy jest `ranking.js`.
 
+**W trybie drużynowym statystyki i 🌱 są wyłączone niezależnie od flagi**
+(`statsEnabled()` = `SHOW_GROUP_STATS && !inTeamMode()`). Drużyn nie ma
+w rankingu zawodników, więc każda wychodziła na 0 pkt i dostawała listek,
+a klubu w tym trybie nie ma w ogóle — stąd „0 klubów" w ciekawostkach.
+Nazwa drużyny renderuje się też jako jeden blok (`.teamName`), a nie
+imię + nazwisko, i cała tabela dostaje **jeden wspólny rozmiar czcionki**
+liczony raz w `computeTeamNameSize()` przed odsłanianiem.
+
 ## Główne funkcje
 - Tryby: z koszykami / bez; indywidualny / drużynowy.
 - Losowanie grup: klik po kliku („Losuj dalej"), pulsujące następne pole,
