@@ -574,6 +574,17 @@ summary:focus-visible {
   color: #1a2448;
 }
 
+/* Nazwa drużyny — cała jednym krojem (bez rozbicia na imię/nazwisko).
+   Rozmiar ustawia JS: jeden wspólny dla całej tabeli. */
+.cell .teamName {
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 1.15;
+  word-break: normal;
+  overflow-wrap: normal;
+  color: #1a2448;
+}
+
 .cell .club {
   font-size: 13px;
   font-weight: 500;
@@ -836,4 +847,4 @@ body.presenting .tableSection h2 { margin: 2px 0 6px; }
    przy odsłanianiu kolejnych osób). */
 .basketViz .cell { min-height: 44px; }
 .basketViz th, .basketViz td { padding: 4px 9px; }
-.basketViz .firstName, .basketViz .lastName { font-size: 15px; }
+.basketViz .firstName, .basketViz .lastName, .basketViz .teamName { font-size: 15px; }
